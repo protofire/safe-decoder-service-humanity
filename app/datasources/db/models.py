@@ -134,7 +134,8 @@ class Abi(SqlQueryBase, TimeStampedSQLModel, table=True):
             select(cls.abi_json).order_by(col(cls.relevance))
         )
         async for (abi_json,) in result:
-            yield cast(ABI, abi_json)
+            if abi_json:  # filters SQL NULL, JSON null, empty list, and empty dict
+                yield cast(ABI, abi_json)
 
     @classmethod
     async def get_abis_with_id_greater_than(cls, last_id: int) -> AsyncIterator[ABI]:
